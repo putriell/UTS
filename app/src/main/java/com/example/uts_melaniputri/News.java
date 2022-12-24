@@ -4,24 +4,25 @@ public class News {
     String title, desc, umur,  kategori, key;
 
 
+
+
+    public News(String title, String desc, String kategori) {
+        this.title = title;
+        this.desc = desc;
+        this.kategori = kategori;
+
+    }
+
+    public News(){
+
+    }
+
     public String getUmur() {
         return umur;
     }
 
     public void setUmur(String umur) {
         this.umur = umur;
-    }
-
-
-
-    public News(String title, String desc, String umur, String kategori) {
-        this.title = title;
-        this.desc = desc;
-
-    }
-
-    public News(){
-
     }
 
     public String getKategori() {

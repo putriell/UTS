@@ -4,15 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,93 +27,73 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    private AdapterNews newsAdapter;
-    RecyclerView.LayoutManager recyclerViewLayoutManager;
-    ArrayList<News> data;
-    String kat, tanggal_lahir, key, filterUmur;
-    FloatingActionButton tambah;
-    DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    Spinner spinner;
+    RecyclerView recyclerViewBerita;
+    List<News> beritas = new ArrayList<>();
+    AdapterNews berita_adapter;
+    String key;
+    Button btn_add;
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        spinner = findViewById(R.id.kategori);
+        btn_add = findViewById(R.id.btn_tambah);
+//        btn_logout = findViewById(R.id.fab_logout);
+        recyclerViewBerita = findViewById(R.id.recyclerview);
 
-        //get data from user detail
-        Intent intent = getIntent();
-        kat = intent.getStringExtra("kategori");
-        tanggal_lahir = intent.getStringExtra("tanggal_lahir");
-
-        //recyclerView
-        recyclerView = findViewById(R.id.recyclerview);
-        recyclerView.setHasFixedSize(true);
-
-        //Button add berita
-        tambah = findViewById(R.id.btn_tambah);
-        tambah.setOnClickListener(new View.OnClickListener() {
+        btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent addNews = new Intent(view.getContext(), AddNews.class);
-                startActivity(addNews);
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AddNews.class);
+                startActivity(intent);
             }
         });
 
-        //menghitung umur
-        String TanggalLahirUser[] = tanggal_lahir.split("-");
-        int umurUser = 2022 - Integer.parseInt(TanggalLahirUser[2]);
-        if (umurUser >= 18 ) {
-            filterUmur = "all";
-        }else {
-            filterUmur = "child";
+//        btn_logout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                MainActivity.logoutPage();
+//                Intent intent = new Intent(v.getContext(), MainActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerViewBerita.setLayoutManager(layoutManager);
+        recyclerViewBerita.setItemAnimator(new DefaultItemAnimator());
+
+        tampilData();
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.labels_array, android.R.layout.simple_spinner_item);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        if (spinner != null) {
+            spinner.setAdapter(adapter);
         }
-
-
-
-        recyclerViewLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        recyclerView.setAdapter(newsAdapter);
-//        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        tampildata();
     }
 
-    private void tampildata() {
-        mDatabaseReference.child("News").addListenerForSingleValueEvent(new ValueEventListener() {
+    private void tampilData() {
+        databaseReference.child("Berita").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                data = new ArrayList<>();
-                for (DataSnapshot item : snapshot.getChildren()){
-                    News dataBerita = item.getValue(News.class);
-                    dataBerita.setKey(item.getKey());
-                    data.add(dataBerita);
+                beritas = new ArrayList<>();
+                for (DataSnapshot item : snapshot.getChildren()) {
+//                    key = item.getKey();
+                    News berita = item.getValue(News.class);
+                    berita.setKey(item.getKey());
+                    beritas.add(berita);
                 }
-
-                newsAdapter = new AdapterNews(data, MainActivity.this, filterUmur, kat);
-                recyclerView.setAdapter(newsAdapter);
-
-
-                //kategori berita
-
-//                for(int i = 0; i < dataBerita.judul.length(); i++){
-//                    if(filterUmur.equals(dataBerita.umur)) {
-//                        if(NewsData.kategori[i].equals(kat)){
-//                            data.add(new News(
-//                                    NewsData.judul[i],
-//                                    NewsData.description[i],
-//                                    NewsData.umur[i],
-//                                    NewsData.kategori[i],
-//                                    ));
-//                        }
-//                    }
-//                }
+                berita_adapter = new AdapterNews(beritas, MainActivity.this);
+                recyclerViewBerita.setAdapter(berita_adapter);
             }
 
             @Override
@@ -118,74 +102,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-//    Spinner spinner;
-//    Button tambah;
-//    RecyclerView listItem;
-//    String key;
-//    AdapterNews adapterNews;
-//
-////    private static String key = "key";
-////    private ArrayList<ModelNews> list = new ArrayList<>();
-//    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-//    ArrayList<ModelNews> listBerita;
-//    private Spinner recyclerView;
-//
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        tambah = findViewById(R.id.btn_tambah);
-//        listItem = findViewById(R.id.recyclerview);
-//        listItem.setAdapter(adapterNews);
-//        listItem.setLayoutManager(new LinearLayoutManager(this));
-////        kategori = findViewById(R.id.kategori);
-//
-//        RecyclerView.LayoutManager mLayout = new LinearLayoutManager(this);
-//        listItem.setLayoutManager(mLayout);
-//        listItem.setItemAnimator(new DefaultItemAnimator());
-//        tampilkanData();
-//
-//        tambah.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(new Intent(MainActivity.this, AddNews.class));
-//            }
-//        });
-////      TextView kategori;
-//
-//    }
-//
-//    private void tampilkanData() {
-//        database.child("Berita").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-////                for (DataSnapshot item : snapshot.getChildren()) {
-////                    key = item.getKey();
-////                    ModelNews berita = item.getValue(ModelNews.class);
-//////                    berita.setTitle(item.getKey());
-////                    listBerita.add(berita);
-////                  }
-////                adapterNews = new AdapterNews(listBerita, MainActivity.this);
-////                recyclerView.setAdapter(adapterNews);
-////
-//                listBerita = new ArrayList<>();
-//                for (DataSnapshot item : snapshot.getChildren()) {
-//                    ModelNews berita = item.getValue(ModelNews.class);
-////                    berita.setKey(item.getKey());
-////                    berita.setTitle(getTitle());
-////                    berita.setDesc(getDesc());
-//                    listBerita.add(berita);
-//                }
-//                adapterNews = new AdapterNews(listBerita, MainActivity.this);
-//                listItem.setAdapter(adapterNews);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 }

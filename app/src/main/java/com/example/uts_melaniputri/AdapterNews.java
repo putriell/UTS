@@ -1,79 +1,103 @@
 package com.example.uts_melaniputri;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
+//public class AdapterNews {
 
-public class AdapterNews extends RecyclerView.Adapter<AdapterNews.MyViewHolder>  {
+public class AdapterNews extends RecyclerView.Adapter<AdapterNews.MyViewHolder>{
 
-    private List<News> mList;
+    private List<News> listBerita;
     private Activity activity;
-    Spinner spinner;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-//    public AdapterNews(RecyclerView mList, Activity activity){
-//        this.mList = (List<News>) mList;
-//        this.activity = activity;
-//    }
-    public AdapterNews(List<News> mList, Activity activity, String filterUmur, String kat){
-        this.mList = mList;
+    public AdapterNews(List<News> listBerita, Activity activity) {
+        this.listBerita = listBerita;
         this.activity = activity;
     }
+
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View viewItem = inflater.inflate(R.layout.layout_item, parent, false);
-        return new MyViewHolder(viewItem);
-
+    public AdapterNews.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item, parent, false);
+        return new MyViewHolder(view);
     }
+
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        final News data = mList.get(position);
-//        holder.tittle.setText(data.getTitle());
-//        holder.desc.setText(data.getDesc());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(holder.itemView.getContext(), DetailBeritaActivity.class);
-//                intent.putExtras("tittle", data.getTitle());
-//                intent.putExtras("deskripsi", data.getDesc());
+    public void onBindViewHolder(@NonNull final AdapterNews.MyViewHolder holder, int position) {
+        final News berita = listBerita.get(position);
+        holder.txtjudul.setText(berita.getTitle());
+        holder.txtisi.setText(berita.getDesc());
 //
-                holder.itemView.getContext().startActivity(intent);
-            }
-        });
+//        holder.delete.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+//                builder.setPositiveButton("iya", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int i) {
+//                        databaseReference.child("Berita").child(berita.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void unused) {
+//                                Toast.makeText(activity, "Data berita berhasil dihapus", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Toast.makeText(activity, "Data gagal dihapus", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    }
+//                }).setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                }).setMessage("Apakah yakin akan dihapus? " + berita.getTitle());
+//                builder.show();
+//            }
+//        });
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return listBerita.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        CardView card_hasil;
-        TextView tittle, desc;
-        ImageView hapus;
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tittle = itemView.findViewById(R.id.titleAdapter);
-            desc = itemView.findViewById(R.id.descAdapter);
-            card_hasil = itemView.findViewById(R.id.card_hasil);
-            hapus = itemView.findViewById(R.id.hapus);
+        TextView txtjudul, txtisi;
+        Spinner spinner;
+        Button update, delete;
+
+        public MyViewHolder(View view) {
+            super(view);
+            txtjudul = view.findViewById(R.id.titleAdapter);
+            txtisi = view.findViewById(R.id.descAdapter);
+            update = view.findViewById(R.id.btn_update);
+            delete = view.findViewById(R.id.btn_delete);
         }
     }
 }
-
