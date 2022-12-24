@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "225443019175",
+    "firebase_url": "https://loginregister-10f1c-default-rtdb.firebaseio.com",
+    "project_id": "loginregister-10f1c",
+    "storage_bucket": "loginregister-10f1c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225443019175:android:3b869d26c391c928311e82",
+        "android_client_info": {
+          "package_name": "com.example.uts_melaniputri"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "225443019175-pn9gts12c9d32bdvr4936ehaoa65ngg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ycbPX7HcbxWX7izAXtmJ33BnPJsr2i4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "225443019175-pn9gts12c9d32bdvr4936ehaoa65ngg0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
